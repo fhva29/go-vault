@@ -1,6 +1,6 @@
 # Makefile for Go project
 
-APP_NAME := go_imagefile_upload
+APP_NAME := go-vault
 SRC := $(shell find . -type f -name '*.go')
 BUILD_DIR := ./bin
 BUILD_PATH := $(BUILD_DIR)/$(APP_NAME)
