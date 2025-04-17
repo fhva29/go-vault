@@ -6,13 +6,14 @@ import (
 
 	"github.com/fhva29/go-vault/internal/config"
 	"github.com/fhva29/go-vault/internal/db"
+	"github.com/fhva29/go-vault/internal/user"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	// Configs and db
 	config.LoadEnv()
-	_ = db.Connect()
+	database := db.Connect()
 
 	r := gin.Default()
 
@@ -21,6 +22,8 @@ func main() {
 			"message": "pong",
 		})
 	})
+
+	user.RegisterRoutes(r, database)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
