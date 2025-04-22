@@ -3,11 +3,13 @@ package user
 import (
 	"errors"
 
+	"github.com/fhva29/go-vault/internal/auth"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
 	Signup(input SignupInput) error
+	Login(input LoginInput) (string, error)
 }
 
 type service struct {
@@ -41,4 +43,23 @@ func (s *service) Signup(input SignupInput) error {
 	}
 
 	return nil
+}
+
+type LoginInput struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+func (s *service) Login(input LoginInput) (string, error) {
+	user, err := s.repo.FindByEmail(input.Email)
+	if err != nil {
+		return "", errors.New("invalid credentials")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+	if err != nil {
+		return "", errors.New("invalid credentials")
+	}
+
+	return auth.GenerateJWT(user.ID)
 }
